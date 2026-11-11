@@ -1,5 +1,8 @@
-import { Alert, Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useEffect, useState } from "react";
+import { Alert, Linking, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { DEFAULT_API_URL } from "../api";
 import { HOTLINES } from "../hotlines";
+import { storage } from "../storage";
 import { colors, radius } from "../theme";
 
 type Props = { onReset: () => void };
@@ -17,6 +20,19 @@ function pretty(num: string) {
 }
 
 export default function Help({ onReset }: Props) {
+  const [url, setUrl] = useState("");
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    storage.getApiUrl().then((u) => setUrl(u || DEFAULT_API_URL));
+  }, []);
+
+  async function saveUrl() {
+    await storage.setApiUrl(url.trim());
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  }
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Tulong Ngayon 💛</Text>
@@ -54,6 +70,24 @@ export default function Help({ onReset }: Props) {
           Pansinin ang 5 bagay na nakikita mo, 4 na nahahawakan mo, 3 na naririnig mo, 2 na naaamoy
           mo, at 1 na nalalasahan mo. Ibinabalik ka nito sa kasalukuyan.
         </Text>
+      </View>
+
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>Server ng AI ⚙️</Text>
+        <Text style={styles.note}>Ang address ng Kaya Mo server (hal. https://kaya-mo.onrender.com).</Text>
+        <TextInput
+          value={url}
+          onChangeText={setUrl}
+          placeholder="https://..."
+          placeholderTextColor={colors.muted}
+          autoCapitalize="none"
+          autoCorrect={false}
+          keyboardType="url"
+          style={styles.input}
+        />
+        <Pressable style={styles.save} onPress={saveUrl}>
+          <Text style={styles.saveText}>{saved ? "Na-save ✓" : "I-save"}</Text>
+        </Pressable>
       </View>
 
       <Text style={styles.disclaimer}>
@@ -97,6 +131,24 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   numText: { color: colors.danger, fontWeight: "700", fontSize: 15 },
+  input: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.sm,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 15,
+    color: colors.text,
+    marginTop: 4,
+  },
+  save: {
+    backgroundColor: colors.accent,
+    borderRadius: radius.lg,
+    paddingVertical: 10,
+    alignItems: "center",
+    marginTop: 6,
+  },
+  saveText: { color: "#fff", fontWeight: "700" },
   disclaimer: { fontSize: 12, color: colors.muted, lineHeight: 18, marginTop: 8 },
   reset: { color: colors.danger, textAlign: "center", marginTop: 8, textDecorationLine: "underline" },
 });

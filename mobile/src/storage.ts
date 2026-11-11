@@ -8,6 +8,7 @@ const KEYS = {
   profile: "kayamo.profile",
   messages: "kayamo.messages",
   proofs: "kayamo.proofs",
+  apiUrl: "kayamo.apiUrl",
 };
 
 async function read<T>(key: string, fallback: T): Promise<T> {
@@ -34,6 +35,8 @@ export const storage = {
   setMessages: (m: Message[]) => write(KEYS.messages, m),
   getProofs: () => read<Proof[]>(KEYS.proofs, []),
   setProofs: (p: Proof[]) => write(KEYS.proofs, p),
+  getApiUrl: () => read<string>(KEYS.apiUrl, ""),
+  setApiUrl: (u: string) => write(KEYS.apiUrl, u),
   clearAll: () => AsyncStorage.multiRemove(Object.values(KEYS)),
 };
 

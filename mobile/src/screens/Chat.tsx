@@ -82,13 +82,16 @@ export default function Chat({ name, onSaveProof, onOpenHelp }: Props) {
         },
       ]);
     } catch (e) {
-      const busy = e instanceof Error && e.message === "busy";
+      const code = e instanceof Error ? e.message : "";
+      const busy = code === "busy";
       setMessages((cur) => [
         ...cur,
         {
           id: newId(),
           role: "assistant",
-          text: busy
+          text: code === "no_server"
+            ? "Wala pang nakatakdang server. Pumunta sa tab na \"Tulong\" → \"Server ng AI\" at ilagay ang server URL."
+            : busy
             ? "Medyo maraming gumagamit ngayon. Subukan mo ulit pagkalipas ng ilang segundo. Hindi kita iniiwan. 💛"
             : "Hindi ako makakonekta ngayon. Pakisuri ang internet mo at subukan ulit. Kung kailangan mo ng kausap agad, pindutin ang \"Tulong\" sa ibaba.",
           at: Date.now(),
